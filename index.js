@@ -15,17 +15,27 @@ const messages = [
 const tmi = require('tmi.js');
 
 const client = new tmi.Client({
+  options: { debug: true },
   connection: {
     secure: true,
     reconnect: true
   },
-  channels: [ 'HellBz' ]
+  identity: {
+    username: 'HellBz',
+    password: process.env.TWITCH_OAUTH_TOKEN
+  },
+  channels: ['HellBz']
 });
 
 client.connect();
 
 client.on('message', (channel, tags, message, self) => {
-  console.log(`${tags['display-name']}: ${message}`);
+  // Ignore echoed messages.
+  if(self) return;
+
+  if(message.toLowerCase() === '!hello') {
+    client.say(channel, `@${tags.username}, Yo what's up`);
+  }
 });
 
 console.log("GPT_MODE is " + GPT_MODE)
